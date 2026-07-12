@@ -309,80 +309,28 @@
             box-shadow: 0 0 10px rgba(46, 213, 115, 0.3);
         }
 
-        /* Mobile Responsive */
         @media (max-width: 480px) {
             .container {
                 padding: 28px 20px;
                 border-radius: 20px;
             }
-
-            .brand-name {
-                font-size: 24px;
-            }
-
-            .brand-icon {
-                width: 34px;
-                height: 34px;
-                font-size: 16px;
-            }
-
-            .form-title {
-                font-size: 18px;
-            }
-
-            .form-group input {
-                padding: 12px 14px;
-                font-size: 14px;
-            }
-
-            .btn-submit {
-                padding: 14px;
-                font-size: 15px;
-            }
+            .brand-name { font-size: 24px; }
+            .brand-icon { width: 34px; height: 34px; font-size: 16px; }
+            .form-title { font-size: 18px; }
+            .form-group input { padding: 12px 14px; font-size: 14px; }
+            .btn-submit { padding: 14px; font-size: 15px; }
         }
 
         @media (max-width: 380px) {
-            .container {
-                padding: 20px 16px;
-            }
-
-            .brand-name {
-                font-size: 20px;
-            }
-
-            .brand-icon {
-                width: 28px;
-                height: 28px;
-                font-size: 13px;
-            }
-
-            .form-title {
-                font-size: 16px;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
+            .container { padding: 20px 16px; }
+            .brand-name { font-size: 20px; }
+            .brand-icon { width: 28px; height: 28px; font-size: 13px; }
+            .form-title { font-size: 16px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Branding -->
         <div class="brand">
             <div class="brand-logo">
                 <div class="brand-icon">S</div>
@@ -393,7 +341,6 @@
 
         <div class="divider"></div>
 
-        <!-- Form -->
         <div class="form-title">Update n8n URI</div>
         <div class="form-subtitle">Connect your n8n automation instance</div>
 
@@ -433,7 +380,6 @@
             </button>
         </form>
 
-        <!-- Result -->
         <div id="result">
             <div class="result-icon" id="resultIcon"></div>
             <div class="result-title" id="resultTitle"></div>
@@ -441,7 +387,6 @@
             <div class="result-details" id="resultDetails"></div>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             <span class="status-dot online"></span>
             <span>SRLIENS v2.0</span>
@@ -468,7 +413,7 @@
 
             const API_URL = 'https://crm.srlines.net/api/user/update_n8n_uri';
 
-            // Clean token
+            // Clean token - remove any "Bearer " prefix
             function cleanToken(token) {
                 return token.replace(/^Bearer\s+/i, '').trim();
             }
@@ -506,6 +451,7 @@
                 const token = cleanToken(apiTokenInput.value);
                 const n8nUri = n8nUriInput.value.trim();
 
+                // Validate
                 if (!token) {
                     showResult(false, 'Validation Error', 'Please enter your API token');
                     apiTokenInput.focus();
@@ -534,7 +480,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': token  // ✅ Token in Authorization header
+                            'Authorization': `Bearer ${token}`  // ✅ Following send_templet pattern
                         },
                         body: JSON.stringify({ 
                             n8n_uri: n8nUri 
@@ -562,6 +508,7 @@
                 }
             });
 
+            // Auto-clean token
             apiTokenInput.addEventListener('paste', function() {
                 setTimeout(() => {
                     this.value = cleanToken(this.value);
