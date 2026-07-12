@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update n8n URI</title>
+    <link rel="icon" href="https://srlines.net/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <form id="n8nForm">
+        <h2>Update n8n URI</h2>
+        <div>
+            <label>API Token:</label>
+            <input type="text" id="apiToken" placeholder="Enter your API token" required>
+        </div>
+        <div>
+            <label>n8n URI:</label>
+            <input type="url" id="n8nUri" placeholder="https://your-n8n-instance.com/webhook" required>
+        </div>
+        <button type="submit">Update</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('n8nForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = document.getElementById('apiToken').value;
+            const n8nUri = document.getElementById('n8nUri').value;
+            const resultDiv = document.getElementById('result');
+
+            try {
+                const response = await fetch('/api/user/update_n8n_uri', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ n8n_uri: n8nUri })
+                });
+
+                const data = await response.json();
+                resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
