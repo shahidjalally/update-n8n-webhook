@@ -40,14 +40,8 @@
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .brand {
@@ -159,16 +153,10 @@
             box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1);
         }
 
-        .form-group input:focus + .input-hint {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
         .input-hint {
             color: rgba(255, 255, 255, 0.3);
             font-size: 11px;
             margin-top: 6px;
-            transition: all 0.3s ease;
             opacity: 0.7;
         }
 
@@ -308,6 +296,19 @@
             display: inline-block;
         }
 
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-dot.online {
+            background: #2ed573;
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.3);
+        }
+
         /* Mobile Responsive */
         @media (max-width: 480px) {
             .container {
@@ -360,7 +361,6 @@
             }
         }
 
-        /* Dark mode scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -377,20 +377,6 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Status indicators */
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-dot.online {
-            background: #2ed573;
-            box-shadow: 0 0 10px rgba(46, 213, 115, 0.3);
         }
     </style>
 </head>
@@ -480,15 +466,13 @@
             const resultMsg = document.getElementById('resultMsg');
             const resultDetails = document.getElementById('resultDetails');
 
-            // API endpoint
             const API_URL = 'https://crm.srlines.net/api/user/update_n8n_uri';
 
-            // Remove any "Bearer " prefix from token
+            // Clean token
             function cleanToken(token) {
                 return token.replace(/^Bearer\s+/i, '').trim();
             }
 
-            // Show result with styling
             function showResult(success, title, msg, details = null) {
                 resultDiv.className = 'show ' + (success ? 'success' : 'error');
                 resultIcon.textContent = success ? '✅' : '❌';
@@ -501,13 +485,11 @@
                     resultDetails.textContent = '';
                 }
 
-                // Scroll to result
                 setTimeout(() => {
                     resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }, 100);
             }
 
-            // Set loading state
             function setLoading(loading) {
                 if (loading) {
                     submitBtn.classList.add('loading');
@@ -518,14 +500,12 @@
                 }
             }
 
-            // Handle form submission
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const token = cleanToken(apiTokenInput.value);
                 const n8nUri = n8nUriInput.value.trim();
 
-                // Validate inputs
                 if (!token) {
                     showResult(false, 'Validation Error', 'Please enter your API token');
                     apiTokenInput.focus();
@@ -538,16 +518,14 @@
                     return;
                 }
 
-                // Validate URL format
                 try {
                     new URL(n8nUri);
                 } catch (err) {
-                    showResult(false, 'Invalid URL', 'Please enter a valid n8n URI (e.g., https://your-instance.com/webhook)');
+                    showResult(false, 'Invalid URL', 'Please enter a valid n8n URI');
                     n8nUriInput.focus();
                     return;
                 }
 
-                // Start loading
                 setLoading(true);
                 resultDiv.className = '';
 
@@ -555,10 +533,10 @@
                     const response = await fetch(API_URL, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': token  // ✅ Token in Authorization header
                         },
                         body: JSON.stringify({ 
-                            token: token,  // Token in body
                             n8n_uri: n8nUri 
                         })
                     });
@@ -568,7 +546,6 @@
                     if (data.success) {
                         showResult(true, 'Success!', data.msg || 'n8n URI updated successfully', data);
                     } else {
-                        // Check if it's a token error
                         if (data.logout) {
                             showResult(false, 'Session Expired', 'Your token is invalid. Please login again.', data);
                         } else {
@@ -577,7 +554,7 @@
                     }
 
                 } catch (error) {
-                    showResult(false, 'Network Error', 'Failed to connect to server. Please check your internet connection.', {
+                    showResult(false, 'Network Error', 'Failed to connect to server.', {
                         error: error.message
                     });
                 } finally {
@@ -585,26 +562,18 @@
                 }
             });
 
-            // Auto-remove "Bearer " prefix when pasting
             apiTokenInput.addEventListener('paste', function() {
                 setTimeout(() => {
                     this.value = cleanToken(this.value);
                 }, 10);
             });
 
-            // Trim on blur
             apiTokenInput.addEventListener('blur', function() {
                 this.value = cleanToken(this.value);
             });
 
-            // Enter key support - already handled by form submit
-            // Additional UX: Clear result on new input
-            apiTokenInput.addEventListener('input', () => {
-                resultDiv.className = '';
-            });
-            n8nUriInput.addEventListener('input', () => {
-                resultDiv.className = '';
-            });
+            apiTokenInput.addEventListener('input', () => { resultDiv.className = ''; });
+            n8nUriInput.addEventListener('input', () => { resultDiv.className = ''; });
 
             console.log('🚀 SRLIENS n8n URI Updater ready');
             console.log(`📡 API Endpoint: ${API_URL}`);
