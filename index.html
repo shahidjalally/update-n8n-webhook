@@ -411,12 +411,8 @@
             const resultMsg = document.getElementById('resultMsg');
             const resultDetails = document.getElementById('resultDetails');
 
-            const API_URL = 'https://crm.srlines.net/api/user/update_n8n_uri';
-
-            // Clean token - remove any "Bearer " prefix
-            function cleanToken(token) {
-                return token.replace(/^Bearer\s+/i, '').trim();
-            }
+            // API endpoint - matching the route in v1.js
+            const API_URL = 'https://crm.srlines.net/api/v1/update_n8n_uri';
 
             function showResult(success, title, msg, details = null) {
                 resultDiv.className = 'show ' + (success ? 'success' : 'error');
@@ -448,7 +444,7 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                const token = cleanToken(apiTokenInput.value);
+                const token = apiTokenInput.value.trim();
                 const n8nUri = n8nUriInput.value.trim();
 
                 // Validate
@@ -476,13 +472,14 @@
                 resultDiv.className = '';
 
                 try {
+                    // Following the same pattern as send_templet - token in body
                     const response = await fetch(API_URL, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`  // ✅ Following send_templet pattern
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ 
+                            token: token,
                             n8n_uri: n8nUri 
                         })
                     });
@@ -490,13 +487,9 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        showResult(true, 'Success!', data.msg || 'n8n URI updated successfully', data);
+                        showResult(true, 'Success!', data.message || 'n8n URI updated successfully', data);
                     } else {
-                        if (data.logout) {
-                            showResult(false, 'Session Expired', 'Your token is invalid. Please login again.', data);
-                        } else {
-                            showResult(false, 'Update Failed', data.msg || 'Something went wrong', data);
-                        }
+                        showResult(false, 'Update Failed', data.message || 'Something went wrong', data);
                     }
 
                 } catch (error) {
@@ -506,17 +499,6 @@
                 } finally {
                     setLoading(false);
                 }
-            });
-
-            // Auto-clean token
-            apiTokenInput.addEventListener('paste', function() {
-                setTimeout(() => {
-                    this.value = cleanToken(this.value);
-                }, 10);
-            });
-
-            apiTokenInput.addEventListener('blur', function() {
-                this.value = cleanToken(this.value);
             });
 
             apiTokenInput.addEventListener('input', () => { resultDiv.className = ''; });
