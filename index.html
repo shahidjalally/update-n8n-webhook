@@ -58,17 +58,21 @@
         }
 
         .brand-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #00d4ff, #7b2ffc);
+            width: 50px;
+            height: 50px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            font-weight: 800;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
         }
 
         .brand-name {
@@ -315,7 +319,7 @@
                 border-radius: 20px;
             }
             .brand-name { font-size: 24px; }
-            .brand-icon { width: 34px; height: 34px; font-size: 16px; }
+            .brand-icon { width: 40px; height: 40px; }
             .form-title { font-size: 18px; }
             .form-group input { padding: 12px 14px; font-size: 14px; }
             .btn-submit { padding: 14px; font-size: 15px; }
@@ -324,7 +328,7 @@
         @media (max-width: 380px) {
             .container { padding: 20px 16px; }
             .brand-name { font-size: 20px; }
-            .brand-icon { width: 28px; height: 28px; font-size: 13px; }
+            .brand-icon { width: 34px; height: 34px; }
             .form-title { font-size: 16px; }
         }
     </style>
@@ -333,7 +337,10 @@
     <div class="container">
         <div class="brand">
             <div class="brand-logo">
-                <div class="brand-icon">S</div>
+                <!-- ✅ CORRECTED: Self-closing img tag -->
+                <div class="brand-icon">
+                    <img src="https://srlines.net/logo.png" alt="SRLIENS LOGO">
+                </div>
                 <div class="brand-name"><span>SRLIENS</span></div>
             </div>
             <div class="brand-sub">Automation Platform</div>
@@ -411,7 +418,6 @@
             const resultMsg = document.getElementById('resultMsg');
             const resultDetails = document.getElementById('resultDetails');
 
-            // API endpoint - matching the route in v1.js
             const API_URL = 'https://crm.srlines.net/api/v1/update_n8n_uri';
 
             function showResult(success, title, msg, details = null) {
@@ -447,7 +453,6 @@
                 const token = apiTokenInput.value.trim();
                 const n8nUri = n8nUriInput.value.trim();
 
-                // Validate
                 if (!token) {
                     showResult(false, 'Validation Error', 'Please enter your API token');
                     apiTokenInput.focus();
@@ -472,7 +477,6 @@
                 resultDiv.className = '';
 
                 try {
-                    // Following the same pattern as send_templet - token in body
                     const response = await fetch(API_URL, {
                         method: 'POST',
                         headers: {
